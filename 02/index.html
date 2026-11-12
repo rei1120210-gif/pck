@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduSmart AI 家教輔導系統 ｜ 數位科技概論</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Chart.js for Radar Chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased selection:bg-blue-500 selection:text-white">
+
+  <!-- 頂部應用導航欄 -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo 與標題 -->
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-500 flex items-center justify-center text-white text-xl shadow-md shadow-blue-500/20">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <h1 class="text-base sm:text-lg font-black text-slate-900 tracking-tight">EduSmart AI 家教系統</h1>
+              <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-100 text-blue-700 tracking-wider uppercase">Pro Tutor</span>
+            </div>
+            <p class="text-xs text-slate-500 hidden sm:block">高中職資訊科技 ｜ 試卷弱點診斷與一對一靶向補救教學</p>
+          </div>
+        </div>
+
+        <!-- 學生快顯資訊與操作按鈕 -->
+        <div class="flex items-center space-x-3">
+          <div id="student-badge" class="hidden md:flex items-center space-x-2">
+            <!-- 由 app.js 動態渲染 -->
+          </div>
+          <button onclick="window.print()" class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold flex items-center transition shadow-sm" title="列印或匯出 PDF 報告">
+            <i class="fa-solid fa-print mr-1.5"></i> 列印學情報告
+          </button>
+        </div>
+      </div>
+
+      <!-- 分頁標籤欄 -->
+      <nav class="flex space-x-1 sm:space-x-4 overflow-x-auto border-t border-slate-100 py-1 text-xs sm:text-sm font-medium">
+        <button class="nav-tab-btn active px-3 py-2 rounded-lg text-slate-600 hover:text-blue-600 flex items-center whitespace-nowrap" data-tab="overview">
+          <i class="fa-solid fa-chart-pie mr-1.5"></i> 學情大數據總覽
+        </button>
+        <button class="nav-tab-btn px-3 py-2 rounded-lg text-slate-600 hover:text-blue-600 flex items-center whitespace-nowrap" data-tab="wrong">
+          <i class="fa-solid fa-triangle-exclamation mr-1.5 text-rose-500"></i> 6大錯題深度精解
+        </button>
+        <button class="nav-tab-btn px-3 py-2 rounded-lg text-slate-600 hover:text-blue-600 flex items-center whitespace-nowrap" data-tab="tutor">
+          <i class="fa-solid fa-robot mr-1.5 text-indigo-500"></i> AI 智慧家教對答
+        </button>
+        <button class="nav-tab-btn px-3 py-2 rounded-lg text-slate-600 hover:text-blue-600 flex items-center whitespace-nowrap" data-tab="quiz">
+          <i class="fa-solid fa-bullseye mr-1.5 text-amber-500"></i> 🎯 靶向強化測驗
+        </button>
+        <button class="nav-tab-btn px-3 py-2 rounded-lg text-slate-600 hover:text-blue-600 flex items-center whitespace-nowrap" data-tab="all">
+          <i class="fa-solid fa-list-check mr-1.5 text-emerald-500"></i> 全卷 25 題庫
+        </button>
+        <button class="nav-tab-btn px-3 py-2 rounded-lg text-slate-600 hover:text-blue-600 flex items-center whitespace-nowrap" data-tab="paper">
+          <i class="fa-solid fa-image mr-1.5 text-slate-500"></i> 原始試卷對照
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 主要內容區 -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- 測驗標頭橫幅 -->
+    <section class="glass-card rounded-3xl p-6 sm:p-8 mb-8 border border-slate-200/90 shadow-sm relative overflow-hidden">
+      <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-blue-100 rounded-full blur-3xl pointer-events-none opacity-60"></div>
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center space-x-2 text-xs font-semibold text-blue-600 mb-1">
+            <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+            <span>隨堂測驗評量檔案 ｜ 已全面完成數位化採集與 AI 觀念診斷</span>
+          </div>
+          <h2 id="student-title" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight"></h2>
+          <p id="student-subtitle" class="text-xs sm:text-sm text-slate-500 mt-1 font-medium"></p>
+        </div>
+        <div class="flex items-center space-x-3">
+          <div class="px-5 py-3 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/25 flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl font-black">
+              76
+            </div>
+            <div>
+              <div class="text-[11px] font-medium text-blue-100">試卷實得成績</div>
+              <div class="text-base font-extrabold tracking-wide">良好 (B+) 級</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 面板 1：學情大數據總覽 -->
+    <section id="pane-overview" class="tab-pane">
+      <!-- 統計指標四宮格 -->
+      <div id="overview-stats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <!-- 由 app.js 動態填充 -->
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-8">
+        <!-- 雷達圖視覺化 -->
+        <div class="lg:col-span-5 glass-card rounded-2xl p-6 border border-slate-200/90 flex flex-col justify-between">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 flex items-center">
+                <i class="fa-solid fa-chart-radar text-blue-600 mr-2"></i> 六大硬體能力雷達圖
+              </h3>
+              <p class="text-xs text-slate-400">電腦五大單元、CPU、記憶體、儲存、I/O與顯示技術</p>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-1 bg-slate-100 rounded text-slate-600">基準滿分 100%</span>
+          </div>
+          <div class="relative w-full h-[320px] flex items-center justify-center">
+            <canvas id="radarChartCanvas"></canvas>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 text-center text-xs text-slate-500">
+            藍色區域愈飽滿代表概念掌握度愈高，凹陷處即為本次需要攻克的關鍵盲區。
+          </div>
+        </div>
+
+        <!-- 知識點維度長條分析與家教處方籤 -->
+        <div class="lg:col-span-7 flex flex-col space-y-6">
+          <div class="glass-card rounded-2xl p-6 border border-slate-200/90">
+            <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center">
+              <i class="fa-solid fa-layer-group text-indigo-600 mr-2"></i> 知識維度掌握率分析
+            </h3>
+            <div id="category-breakdown-list" class="space-y-3">
+              <!-- 由 app.js 填充 -->
+            </div>
+          </div>
+
+          <!-- 家教名師處方籤 -->
+          <div class="glass-card rounded-2xl p-6 border-l-4 border-l-blue-600">
+            <div class="flex items-center space-x-2 mb-2">
+              <span class="w-7 h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
+                <i class="fa-solid fa-stethoscope"></i>
+              </span>
+              <h3 class="text-sm font-bold text-slate-800">家教名師學情綜合診斷</h3>
+            </div>
+            <p id="tutor-diagnostic-text" class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4"></p>
+            <div class="pt-3 border-t border-slate-100">
+              <h4 class="text-xs font-bold text-blue-900 mb-2 flex items-center">
+                <i class="fa-solid fa-list-check mr-1.5 text-blue-600"></i> 三步靶向提分處方：
+              </h4>
+              <div id="tutor-prescription"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 面板 2：6大錯題深度精解 -->
+    <section id="pane-wrong" class="tab-pane hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <div>
+          <h3 class="text-lg font-black text-slate-900 flex items-center">
+            <i class="fa-solid fa-triangle-exclamation text-rose-500 mr-2"></i> 本次測驗 6 大扣分題深度剖析
+          </h3>
+          <p class="text-xs text-slate-500">針對政緯答錯的第 3、10、15、16、17、22 題進行病灶定位與記憶口訣灌頂</p>
+        </div>
+        <button onclick="switchTab('quiz')" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs shadow-md shadow-amber-500/20 flex items-center transition self-start sm:self-auto">
+          <i class="fa-solid fa-bolt mr-1.5"></i> 馬上進行靶向強化測驗
+        </button>
+      </div>
+
+      <div id="wrong-questions-container" class="space-y-6">
+        <!-- 由 app.js 填充 -->
+      </div>
+    </section>
+
+    <!-- 面板 3：AI 智慧家教對話 -->
+    <section id="pane-tutor" class="tab-pane hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- 左側快捷提問按鈕 -->
+        <div class="lg:col-span-4 flex flex-col space-y-4">
+          <div class="glass-card rounded-2xl p-5 border border-slate-200">
+            <div class="flex items-center space-x-2 mb-3">
+              <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm font-bold">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+              </div>
+              <h3 class="text-sm font-bold text-slate-800">一鍵快捷發問</h3>
+            </div>
+            <p class="text-xs text-slate-500 mb-3">點擊以下本次考試最高頻的迷思觀念，家教老師立即深入為您講題：</p>
+            <div class="space-y-2">
+              <button onclick="askTutorDirect('老師，為什麼 SSD 固態硬碟絕對不要做磁碟重組？重組不是會變快嗎？')" class="w-full text-left p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-700 text-xs text-slate-700 transition border border-slate-200/80 flex items-center justify-between">
+                <span>⚡ 為什麼 SSD 不能做磁碟重組？</span>
+                <i class="fa-solid fa-angle-right text-[10px] text-slate-400"></i>
+              </button>
+              <button onclick="askTutorDirect('老師，SRAM 和 DRAM 到底差在哪裡？考試常常考快取記憶體材質，怎麼秒殺？')" class="w-full text-left p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-700 text-xs text-slate-700 transition border border-slate-200/80 flex items-center justify-between">
+                <span>⚡ SRAM 和 DRAM 怎麼一秒分清？</span>
+                <i class="fa-solid fa-angle-right text-[10px] text-slate-400"></i>
+              </button>
+              <button onclick="askTutorDirect('老師，第15題的 2.80GHz，G到底代表多少？為什麼選項寫 2.80億次 是錯的？')" class="w-full text-left p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-700 text-xs text-slate-700 transition border border-slate-200/80 flex items-center justify-between">
+                <span>⚡ 2.80GHz 的 G 是幾億？單位換算陷阱</span>
+                <i class="fa-solid fa-angle-right text-[10px] text-slate-400"></i>
+              </button>
+              <button onclick="askTutorDirect('老師，MIPS 的 I 為什麼不是 Information 資訊？還有哪些相關指標？')" class="w-full text-left p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-700 text-xs text-slate-700 transition border border-slate-200/80 flex items-center justify-between">
+                <span>⚡ MIPS 的 I 是指令還是資訊？</span>
+                <i class="fa-solid fa-angle-right text-[10px] text-slate-400"></i>
+              </button>
+              <button onclick="askTutorDirect('老師，AMOLED 螢幕為什麼叫有機發光二極體？跟液晶 (LCD) 有什麼不同？')" class="w-full text-left p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-700 text-xs text-slate-700 transition border border-slate-200/80 flex items-center justify-between">
+                <span>⚡ AMOLED 為什麼叫有機發光二極體？</span>
+                <i class="fa-solid fa-angle-right text-[10px] text-slate-400"></i>
+              </button>
+              <button onclick="askTutorDirect('老師，第3題的記憶單元到底裡面存了什麼東西？為什麼不是僅儲存輸入資料？')" class="w-full text-left p-2.5 rounded-xl bg-slate-50 hover:bg-blue-50 hover:text-blue-700 text-xs text-slate-700 transition border border-slate-200/80 flex items-center justify-between">
+                <span>⚡ 電腦五大單元：記憶單元到底裝什麼？</span>
+                <i class="fa-solid fa-angle-right text-[10px] text-slate-400"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- 家教陪伴小提示 -->
+          <div class="glass-card rounded-2xl p-5 border border-slate-200 bg-gradient-to-br from-indigo-50 to-blue-50">
+            <h4 class="text-xs font-bold text-indigo-900 mb-1 flex items-center">
+              <i class="fa-solid fa-headphones text-indigo-600 mr-1.5"></i> 支援語音朗讀伴讀
+            </h4>
+            <p class="text-[11px] text-slate-600 leading-relaxed">
+              點擊老師訊息右上角的喇叭圖示 <i class="fa-solid fa-volume-high text-slate-400 mx-1"></i>，系統將以道地語調為您朗讀解說，如同私人老師在一旁親切指導！
+            </p>
+          </div>
+        </div>
+
+        <!-- 右側對話視窗 -->
+        <div class="lg:col-span-8 flex flex-col h-[650px] glass-card rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <!-- 對話頭像狀態 -->
+          <div class="p-4 bg-white border-b border-slate-100 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="relative">
+                <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow">
+                  <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+                <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white"></span>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-800 text-sm">小智老師 ｜ 專屬資訊科家教</h4>
+                <p class="text-[11px] text-emerald-600 font-medium">在線輔導中 • 隨時解答任何硬體觀念疑問</p>
+              </div>
+            </div>
+            <button onclick="askTutorDirect('老師，請為我總結這次考卷我該如何從 76 分加強到 100 分？')" class="text-xs text-blue-600 hover:text-blue-800 font-medium px-3 py-1 bg-blue-50 rounded-lg">
+              <i class="fa-solid fa-arrow-trend-up mr-1"></i> 提分衝刺總結
+            </button>
+          </div>
+
+          <!-- 訊息列表區 -->
+          <div id="chat-messages-container" class="flex-1 p-4 overflow-y-auto bg-slate-50/70">
+            <!-- 由 app.js 動態渲染對話訊息 -->
+          </div>
+
+          <!-- 底部輸入列 -->
+          <div class="p-3 bg-white border-t border-slate-100">
+            <form onsubmit="event.preventDefault(); handleUserSend();" class="flex items-center space-x-2">
+              <input id="tutor-user-input" type="text" placeholder="向小智老師提問，例如：『為什麼快取要用 SRAM？』..." class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-slate-50">
+              <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center flex-shrink-0">
+                <span>送出</span>
+                <i class="fa-solid fa-paper-plane ml-1.5 text-xs"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 面板 4：靶向強化測驗 -->
+    <section id="pane-quiz" class="tab-pane hidden">
+      <div class="max-w-3xl mx-auto">
+        <div class="text-center mb-8">
+          <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 inline-block mb-2">
+            Targeted Remedial Quiz
+          </span>
+          <h3 class="text-xl sm:text-2xl font-black text-slate-900">🎯 6大核心弱點靶向過關測驗</h3>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">針對原試卷失分的 6 大關鍵概念精選變形題，即刻實測並驗收補救學習成果</p>
+        </div>
+
+        <div id="quiz-step-container">
+          <!-- 由 app.js 渲染單題測驗或結算卡片 -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 面板 5：全卷 25 題庫 -->
+    <section id="pane-all" class="tab-pane hidden">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h3 class="text-lg font-black text-slate-900 flex items-center">
+            <i class="fa-solid fa-list-check text-blue-600 mr-2"></i> 完整試題收錄（全卷 25 題）
+          </h3>
+          <p class="text-xs text-slate-500">每題 4 分，支援篩選與語音朗讀試題</p>
+        </div>
+        <div id="question-filters" class="flex items-center space-x-2">
+          <!-- 由 app.js 填充篩選標籤 -->
+        </div>
+      </div>
+
+      <div id="all-questions-container" class="space-y-4">
+        <!-- 由 app.js 填充 -->
+      </div>
+    </section>
+
+    <!-- 面板 6：原始試卷照片對照 -->
+    <section id="pane-paper" class="tab-pane hidden">
+      <div class="mb-6">
+        <h3 class="text-lg font-black text-slate-900 flex items-center">
+          <i class="fa-solid fa-file-invoice text-slate-700 mr-2"></i> 原始實體試卷照片數位對照
+        </h3>
+        <p class="text-xs text-slate-500">點擊圖片可進入全螢幕燈箱放大檢視學生原始作答與任課老師紅筆批改註記</p>
+      </div>
+
+      <div id="paper-images-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- 由 app.js 渲染圖片卡片 -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 高清圖片放大燈箱 Modal -->
+  <div id="image-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+      <div class="p-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        <h4 id="modal-img-title" class="font-bold text-slate-800 text-sm"></h4>
+        <button id="close-modal-btn" class="w-8 h-8 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="flex-1 p-2 overflow-auto flex items-center justify-center bg-slate-950">
+        <img id="modal-img" src="" alt="放大預覽" class="max-h-[80vh] w-auto object-contain">
+      </div>
+    </div>
+  </div>
+
+  <!-- 頁尾 -->
+  <footer class="mt-16 py-8 border-t border-slate-200 bg-white text-center text-xs text-slate-400 no-print">
+    <div class="max-w-7xl mx-auto px-4">
+      <p>EduSmart AI 家教輔導系統 ｜ 陪伴每一位學生精準補救、邁向滿分</p>
+      <p class="mt-1 text-[11px] text-slate-400">數位科技概論（系統平台硬體篇） ｜ 授課對象：資科一年仁班 李政緯</p>
+    </div>
+  </footer>
+
+  <!-- 核心資料與控制腳本 -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,138 @@
+/* EduSmart AI 家教系統客製化樣式 */
+
+:root {
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --secondary-color: #0f172a;
+  --accent-color: #f59e0b;
+  --danger-color: #ef4444;
+  --success-color: #10b981;
+  --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+  background: #f1f5f9;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+/* 玻璃擬態質感卡片 */
+.glass-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+}
+
+.glass-card-hover {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
+}
+
+/* 漸層標題 */
+.text-gradient {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #0284c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 自訂標籤頁樣式 */
+.nav-tab-btn {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.nav-tab-btn.active {
+  color: #2563eb;
+  background-color: #eff6ff;
+  font-weight: 600;
+}
+
+.nav-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 15%;
+  right: 15%;
+  height: 3px;
+  background: #2563eb;
+  border-radius: 9999px;
+}
+
+/* 對話氣泡動畫 */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-bubble {
+  animation: slideUp 0.25s ease-out forwards;
+}
+
+/* 卷軸美化 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 燈箱縮放預覽 */
+.image-zoom-container {
+  overflow: hidden;
+  cursor: zoom-in;
+}
+
+.image-zoom-container img {
+  transition: transform 0.3s ease;
+}
+
+.image-zoom-container:hover img {
+  transform: scale(1.02);
+}
+
+/* 模擬試卷紅筆手寫筆跡感標籤 */
+.teacher-red-mark {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-left: 4px solid #ef4444;
+  font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* 列印專用樣式 */
+@media print {
+  body {
+    background: white !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-page-break {
+    page-break-before: always;
+  }
+  .glass-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}
+
